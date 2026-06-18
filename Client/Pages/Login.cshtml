@@ -1,0 +1,70 @@
+﻿@page
+@model MeepleSystemClient.Pages.LoginModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+
+    <link rel="stylesheet" href="~/css/login.css" />
+</head>
+
+<body>
+
+    <div class="login-container">
+
+        <div class="login-card">
+
+            <h2>Login</h2>
+
+            <form method="post">
+
+                <!-- Username -->
+                <div class="form-group">
+                    <label>User Name</label>
+
+                    <input asp-for="Email"
+                           class="form-input"
+                           placeholder="Enter your username" />
+                </div>
+
+                <!-- Password -->
+                <div class="form-group">
+                    <label>Password</label>
+
+                    <input asp-for="Password"
+                           type="password"
+                           class="form-input"
+                           placeholder="Enter your password" />
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="login-btn">
+                    Login
+                </button>
+
+                <!-- Register -->
+                <p class="register-link">
+                    @* Don't have an account?
+                    <a asp-page="/Register">Register</a> *@
+                </p>
+
+                <!-- Error -->
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <p class="error">@Model.ErrorMessage</p>
+                }
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+﻿@page
+@model ReportModel
+
+<h2 class="container mb-3">Report Page</h2>
+
+<div class="container mt-3">
+    <div class="row">
+
+        <!-- LEFT FILTER PANEL -->
+        <div class="col-md-3 filter-panel p-3">
+
+            <!-- GENERATE REPORT -->
+            <form method="post">
+                <button type="submit" class="btn btn-warning mb-3 w-100">
+                    Generate Report
+                </button>
+
+                <!-- Filter By -->
+                <div class="mb-3">
+                    <label>Filter By:</label>
+                    <select class="form-control" asp-for="Most">
+                        <option value="true">Most Played</option>
+                        <option value="false">Least Played</option>
+                    </select>
+                </div>
+
+                <!-- Time Frame -->
+                <div class="mb-3">
+                    <label>Time Frame:</label>
+                    <select class="form-control" asp-for="Timeframe">
+                        <option value="7">Last Week</option>
+                        <option value="30">Last Month</option>
+                        <option value="365">Last Year</option>
+                        <option value="0">All Time</option>
+                    </select>
+                </div>
+
+                <!-- Results -->
+                <div class="mb-3">
+                    <label>Results (leave blank for all):</label>
+                    <input class="form-control"
+                           asp-for="Quantity"
+                           placeholder="All results" />
+                </div>
+            </form>
+
+            <!-- CSV UPLOAD -->
+            <form method="post" enctype="multipart/form-data" asp-page-handler="Upload">
+                <div class="mb-2">
+                    <label>Upload CSV:</label>
+                    <input type="file" name="UploadFile" class="form-control" />
+                </div>
+                <button type="submit" class="btn export-btn w-100">
+                    Upload CSV
+                </button>
+            </form>
+
+        </div>
+
+        <!-- RIGHT RESULTS PANEL -->
+        <div class="col-md-9 results-panel p-3">
+
+            <h5>
+                Results:
+                <span class="text-muted">
+                    (@Model.Games.Count)
+                </span>
+            </h5>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="text-danger mb-2">
+                    @Model.ErrorMessage
+                </div>
+            }
+
+            <div class="results-box">
+
+                @if (Model.Games != null && Model.Games.Any())
+                {
+                    @foreach (var game in Model.Games)
+                    {
+                        <a asp-page="/Details"
+                           asp-route-title="@game.Title"
+                           class="result-link text-decoration-none">
+
+                            <div class="result-item d-flex align-items-center mb-2 p-2">
+
+                                <img src="~/images/logo.png"
+                                     class="me-3 rounded"
+                                     style="width: 60px;" />
+
+                                <div class="flex-grow-1">
+                                    <strong>@game.Title</strong><br />
+                                    Times Played: @game.TimesPlayed<br />
+                                    Location: @game.Location
+                                </div>
+
+                            </div>
+                        </a>
+                    }
+                }
+                else
+                {
+                    <p>No results yet. Click "Generate Report".</p>
+                }
+
+            </div>
+
+            <!-- CSV EXPORT -->
+            <div class="text-end mt-3">
+                <form method="post" asp-page-handler="Export">
+                    <button type="submit" class="btn export-btn">
+                        Export to CSV
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+</div>

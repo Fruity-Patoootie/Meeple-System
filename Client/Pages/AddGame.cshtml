@@ -1,0 +1,249 @@
+﻿@page
+@model MeepleSystemClient.Pages.AddGameModel
+
+
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+}
+
+<!-- ==================== HEADER ==================== -->
+<div class="report-header d-flex align-items-center justify-content-between mb-3">
+
+    <div class="tab-bar">
+
+        <a asp-page="/CheckIn"
+               class="tab @(currentPage == "/CheckIn" ? "active" : "")">
+            Check In
+        </a>
+
+        <a asp-page="/AddGame"
+               class="tab @(currentPage == "/AddGame" ? "active" : "")">
+            Add Game
+        </a>
+        
+        <a asp-page="/AddGameFromCSV"
+               class="tab @(currentPage == "/AddGameFromCSV" ? "active" : "")">
+            Add Game From CSV
+        </a>
+
+        <a asp-page="/Delete"
+               class="tab delete-tab @(currentPage == "/Delete" ? "active" : "")">
+            Delete Game
+        </a>
+
+    </div>
+
+</div>
+
+<div class="container d-flex justify-content-center mt-4">
+
+    <div class="game-wrapper">
+
+        <h2 class="game-title">
+            Add Games
+        </h2>
+
+    <div class="filter-panel p-4 w-100">
+
+        <!-- MESSAGE -->
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="alert alert-info text-center">
+                @Model.Message
+            </div>
+        }
+
+        <!-- ================= BARCODE ================= -->
+        <form method="post" asp-page-handler="CheckBarcode">
+            <label>Scan / Enter Barcode</label>
+            <input asp-for="BarcodeInput" class="form-control" />
+
+            <button type="submit" class="btn export-btn mt-2 w-100">
+                Check Barcode
+            </button>
+        </form>
+
+        <hr />
+
+        <div class="mt-2 text-center video-wrapper">
+
+            <video id="video" class="scanner-video"></video>
+
+            <div class="mt-2">
+                <button type="button" id="startScan" class="btn export-btn btn-sm">
+                    Scan Barcode
+                </button>
+            </div>
+
+            <small class="text-dark d-block mt-1">
+                Scanned Code: <span id="result">None</span>
+            </small>
+
+        </div>
+
+        <!-- ================= MAIN FORM ================= -->
+        <form method="post">
+
+            <!--BASIC INFO-->
+
+            <h5>Basic Info</h5>
+
+            <div class="mb-2">
+                <label>Title</label>
+                <input asp-for="Game.Title" class="form-control" />
+            </div>
+
+            <div class="mb-2">
+                <label>Barcode</label>
+                <input asp-for="Game.Barcode"
+                       class="form-control"
+                       maxlength="13"
+                       inputmode="numeric"
+                       pattern="[0-9]*" /> <!--Prevent bad input-->
+            </div>
+
+            <div class="mb-2">
+                <label>Style</label>
+                <input asp-for="Game.Style"
+                       maxlength="50"
+                       class="form-control" />
+            </div>
+
+
+            <!--GAME DETAILS-->
+
+            <h5 class="mt-3">Game Details</h5>
+
+            <div class="row">
+                <div class="col">
+                    <label>Min Players</label>
+                    <input asp-for="Game.MinPlayers" type="number" class="form-control" />
+                </div>
+
+                <div class="col">
+                    <label>Max Players</label>
+                    <input asp-for="Game.MaxPlayers" type="number" class="form-control" />
+                </div>
+            </div>
+
+            <div class="row mt-2">
+                <div class="col">
+                    <label>Min Duration (minutes)</label>
+                    <input asp-for="Game.MinDuration" type="number" class="form-control" />
+                </div>
+
+                <div class="col">
+                    <label>Max Duration (minutes)</label>
+                    <input asp-for="Game.MaxDuration" type="number" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <label>Weight (complexity)</label>
+                <input asp-for="Game.Weight"
+                       type="number"
+                       step="0.01"
+                       min="0"
+                       max="99.99"
+                       class="form-control" /> <!--Match decimal(4,2) format-->
+            </div>
+
+
+            <!--PLAYERS-->
+
+            <h5 class="mt-3">Players</h5>
+
+            <div class="mb-2">
+                <label>Recommended Players</label>
+                <input asp-for="Game.RecommendedPlayers" class="form-control" />
+            </div>
+
+            <div class="mb-2">
+                <label>Best Players</label>
+                <input asp-for="Game.BestPlayers" class="form-control" />
+            </div>
+
+
+            <!--PURCHASE-->
+            
+            <h5 class="mt-3">Purchase</h5>
+
+            <div class="mb-2">
+                <label>Cost ($)</label>
+                <input asp-for="Game.Cost"
+                       type="number"
+                       step="0.01"
+                       min="0"
+                       max="999.99"
+                       class="form-control" /> <!--Match decimal(5,2) format-->
+            </div>
+
+            <div class="mb-2">
+                <label>Date Acquired</label>
+                <input asp-for="Game.DateAcquired" type="date" class="form-control" />
+            </div>
+
+            <div class="mb-2">
+                <label>Supplier</label>
+                <input asp-for="Game.SupplierName" class="form-control" />
+            </div>
+
+            <div class="mb-2">
+                <label>Seller</label>
+                <input asp-for="Game.SellerName" class="form-control" />
+            </div>
+
+
+            <!--ADDITIONAL-->
+
+            <h5 class="mt-3">Additional</h5>
+
+            <div class="mb-2">
+                <label>Location</label>
+                <input asp-for="Game.LocationName" class="form-control" />
+            </div>
+
+            <div class="mb-2">
+                <label>Image URL</label>
+                <input asp-for="Game.ImageLocation" class="form-control" />
+            </div>
+
+            <div class="mb-2">
+                <label>BGG Game ID</label>
+                <input asp-for="Game.BggGameId" type="number" class="form-control" />
+            </div>
+
+            <div class="form-check mt-2">
+                <input asp-for="Game.Expansion" class="form-check-input" />
+                <label class="form-check-label">Expansion</label>
+            </div>
+
+            <div class="form-check">
+                <input asp-for="Game.NeedsAddedToBgg" class="form-check-input" />
+                <label class="form-check-label">Needs BGG Entry</label>
+            </div>
+
+            <div class="text-center mt-3 d-flex justify-content-between">
+
+                <button type="submit" asp-page-handler="SaveGame"
+                        class="btn export-btn w-50 me-2">
+                    Save Game
+                </button>
+
+            </div>
+
+        </form>
+    </div>
+</div>
+@section Scripts {
+
+    <!-- Validation -->
+    <partial name="_ValidationScriptsPartial" />
+
+    <!-- ZXing Barcode Library -->
+    <script src="https://unpkg.com/@@zxing/library@latest/umd/index.min.js"></script>
+
+    <!-- Barcode Scanner Script -->
+    <script src="~/js/barcodeScanner.js"></script>
+
+}

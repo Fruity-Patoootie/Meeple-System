@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MeepleSystemClient</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/MeepleSystemClient.styles.css" asp-append-version="true" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="meeple-nav container-fluid">
+
+            <!-- LEFT -->
+            <div class="nav-left">
+                <a asp-page="/Index" class="logo-link">
+                    <img src="~/images/logo.png" alt="Village Meeple" class="logo-img" />
+                </a>
+
+                <a asp-page="/Report" class="nav-pill">Report</a>
+                <a asp-page="/CheckIn" class="nav-pill">Collection</a>
+            </div>
+
+            <!-- CENTER -->
+            <div class="nav-center">
+                <form method="get" asp-page="/Search" class="d-flex gap-2">
+                    <input type="text" name="Query" placeholder="Search MS..." class="search-box" />
+                    <button type="submit" class="nav-pill">Search</button>
+                </form>
+            </div>
+
+            <!-- RIGHT -->
+            <div class="nav-right">
+                <form method="post" asp-page="/Index" asp-page-handler="Logout">
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
+
+        </div>
+    </header>
+    <div class="container-fluid p-0">
+        <main role="main">
+            <!--This is where my page content goes (<div> container etc.)-->
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2026 - MeepleSystemClient - <a asp-area="" asp-page="/Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

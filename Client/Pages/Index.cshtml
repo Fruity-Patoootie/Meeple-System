@@ -1,0 +1,37 @@
+﻿@page
+@model MeepleSystemClient.Pages.IndexModel
+
+<!-- PAGE LAYOUT -->
+<!-- The container classes control the layout inside my page -->
+<div class="container home-container">
+
+    <!-- HERO IMAGE -->
+    <div class="hero-container">
+        <!-- The Meeples club room image -->
+        <img src="https://images.squarespace-cdn.com/content/v1/640f7e445ec8da48489babef/c985b47f-c9ce-4ecf-b4dd-8909760fedc8/1R3A3924-Enhanced-NR.jpg"
+             class="hero-img" />
+        <!-- Dynamic Welcome text that includes the User's username prefix-->
+        <!-- NOTE: Change to Name Eventually-->
+        <div class="hero-overlay">
+            <h1 class="text-white fw-bold">
+                Welcome <span class="text-warning">@Model.Username</span>!
+            </h1>
+        </div>
+    </div>
+
+    <!-- LOGOUT BUTTON -->
+    <!-- Sends a post request to OnPostLogput() -->
+    <form method="post" asp-page-handler="Logout" style="margin-top:15px;">
+        <button type="submit" class="btn btn-danger">Logout</button>
+    </form>
+
+    <!-- ERROR MESSAGE -->
+    <!-- Catches Fails on the UI side in case something happens on the API side etc.-->
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div style="color:red; margin-top:15px;">
+            @Model.ErrorMessage
+        </div>
+    }
+
+</div>

@@ -1,0 +1,66 @@
+﻿@page
+@model AddGameFromCSVModel
+
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+}
+
+<div class="report-header d-flex align-items-center justify-content-between mb-3">
+
+    <div class="tab-bar">
+
+        <a asp-page="/CheckIn"
+               class="tab @(currentPage == "/CheckIn" ? "active" : "")">
+            Check In
+        </a>
+
+        <a asp-page="/AddGame"
+               class="tab @(currentPage == "/AddGame" ? "active" : "")">
+            Add Game
+        </a>
+
+        <a asp-page="/AddGameFromCSV"
+               class="tab @(currentPage == "/AddGameFromCSV" ? "active" : "")">
+            Add Game From CSV
+        </a>
+
+        <a asp-page="/Delete"
+               class="tab delete-tab @(currentPage == "/Delete" ? "active" : "")">
+            Delete Game
+        </a>
+
+    </div>
+</div>
+
+<div class="container mt-4">
+
+    <div class="game-wrapper">
+
+        <h2 class="game-title">
+            Add Games From CSV
+        </h2>
+
+    <form method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+
+        <div class="mb-3">
+            <label class="form-label">Select CSV File</label>
+            <input type="file"
+                   asp-for="Upload"
+                   class="form-control"
+                   accept=".csv" />
+        </div>
+
+        <button type="submit" class="btn export-btn">
+            Upload CSV
+        </button>
+
+    </form>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert mt-3 @(Model.IsSuccess ? "alert-success" : "alert-danger")">
+            @Model.Message
+        </div>
+    }
+
+</div>

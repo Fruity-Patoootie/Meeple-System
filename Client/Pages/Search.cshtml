@@ -1,0 +1,75 @@
+﻿@page
+@model SearchModel
+
+<div class="search-page">
+
+    <div class="search-container">
+
+        <h1 class="search-title">
+            Search Results
+        </h1>
+
+        <div class="mb-3">
+            <strong>@Model.Games.Count</strong> results found
+        </div>
+
+        @if (string.IsNullOrWhiteSpace(Model.Query))
+        {
+            <div class="text-dark">
+                Showing all games.
+            </div>
+        }
+
+        @if (Model.NoMatchesFound)
+        {
+            <div class="text-danger mb-4">
+                No games found for "@Model.Query".
+                Showing all games instead.
+            </div>
+        }
+
+        <div class="results-grid">
+
+            @foreach (var game in Model.Games)
+            {
+                <a class="result-card"
+                       asp-page="/Details"
+                       asp-route-title="@game.Title">
+
+                    <img src="@(
+                                             string.IsNullOrWhiteSpace(game.ImageLocation)
+                                                 ? "/images/logo.png"
+                                                 : game.ImageLocation)"
+                         class="result-image" />
+
+                    <div class="result-info">
+
+                        <div class="result-title">
+                            @game.Title
+                        </div>
+
+                        <div>
+                            Players:
+                            @game.MinPlayers - @game.MaxPlayers
+                        </div>
+
+                        <div>
+                            Weight:
+                            @game.Weight
+                        </div>
+
+                        <div>
+                            Duration:
+                            @game.MinDuration - @game.MaxDuration mins
+                        </div>
+
+                    </div>
+
+                </a>
+            }
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,326 @@
+﻿@page
+@model DeleteGameModel
+
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString();
+}
+
+<!-- ==================== HEADER ==================== -->
+<div class="report-header d-flex align-items-center justify-content-between mb-3">
+
+    <div class="tab-bar">
+
+        <a asp-page="/CheckIn"
+               class="tab @(currentPage == "/CheckIn" ? "active" : "")">
+            Check In
+        </a>
+
+        <a asp-page="/AddGame"
+               class="tab @(currentPage == "/AddGame" ? "active" : "")">
+            Add Game
+        </a>
+
+        <a asp-page="/AddGameFromCSV"
+               class="tab @(currentPage == "/AddGameFromCSV" ? "active" : "")">
+            Add Game From CSV
+        </a>
+
+        <a asp-page="/Delete"
+               class="tab delete-tab @(currentPage == "/Delete" ? "active" : "")">
+            Delete Game
+        </a>
+
+    </div>
+
+</div>
+
+<!-- ==================== CONTENT ==================== -->
+<div class="container">
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="alert alert-info mb-3">
+            @Model.SuccessMessage
+        </div>
+    }
+
+    <div class="row">
+
+        <!-- ==================== LEFT PANEL ==================== -->
+        <div class="col-md-5">
+
+            <div class="delete-panel p-4">
+
+                <h5 class="mb-3">Find Game</h5>
+
+                <!-- ================= BARCODE ================= -->
+                <form method="post"
+                      asp-page-handler="LookupBarcode"
+                      class="mb-3">
+
+                    <label class="mb-2">
+                        Scan / Enter Barcode
+                    </label>
+
+                    <input asp-for="Barcode"
+                           id="BarcodeInput"
+                           class="form-control mb-2"
+                           placeholder="Scan or enter barcode"
+                           autocomplete="off" />
+
+                    @for (int i = 0; i < Model.GamesToDelete.Count; i++)
+                    {
+                        <input type="hidden" asp-for="GamesToDelete[i].Title" />
+                        <input type="hidden" asp-for="GamesToDelete[i].Barcode" />
+                        <input type="hidden" asp-for="GamesToDelete[i].ImageLocation" />
+                        <input type="hidden" asp-for="GamesToDelete[i].LocationName" />
+                    }
+
+                    <button type="submit"
+                            class="btn btn-dark mt-2 w-100">
+                        Check Barcode
+                    </button>
+
+                </form>
+
+                <hr />
+
+                <!-- ================= SCANNER ================= -->
+                <div class="video-wrapper mt-3">
+
+                    <video id="video"
+                           class="scanner-video"
+                           autoplay
+                           muted
+                           playsinline>
+                    </video>
+
+                    <div class="mt-2">
+
+                        <button type="button"
+                                id="startScan"
+                                class="btn btn-dark btn-sm">
+                            Scan Barcode
+                        </button>
+
+                    </div>
+
+                    <small class="text-dark d-block mt-2">
+                        Scanned Code:
+                        <span id="result">None</span>
+                    </small>
+
+                </div>
+
+                <hr />
+
+                <!-- ================= TITLE SEARCH ================= -->
+                <form method="post"
+                      asp-page-handler="LookupTitle">
+
+                    <label class="mb-2">
+                        Title Search
+                    </label>
+
+                    <input asp-for="Title"
+                           class="form-control mb-2"
+                           placeholder="Enter game title"
+                           autocomplete="off" />
+
+                    @for (int i = 0; i < Model.GamesToDelete.Count; i++)
+                    {
+                        <input type="hidden" asp-for="GamesToDelete[i].Title" />
+                        <input type="hidden" asp-for="GamesToDelete[i].Barcode" />
+                        <input type="hidden" asp-for="GamesToDelete[i].ImageLocation" />
+                        <input type="hidden" asp-for="GamesToDelete[i].LocationName" />
+                    }
+
+                    <button class="btn btn-dark w-100">
+                        Check Title
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- ==================== RIGHT PANEL ==================== -->
+        <div class="col-md-7">
+
+            <div class="delete-panel p-4">
+
+                <h5 class="mb-3">To Be Deleted</h5>
+
+                @if (!Model.GamesToDelete.Any())
+                {
+                    <div class="text-center text-dark p-4">
+                        No games selected
+                    </div>
+                }
+
+                @foreach (var game in Model.GamesToDelete)
+                {
+                    <div class="result-item delete-item d-flex align-items-center justify-content-between mb-2 p-3">
+
+                        <div class="d-flex align-items-center">
+
+                            <img src="@(
+                                                             string.IsNullOrWhiteSpace(game.ImageLocation)
+                                                                 ? "/images/logo.png"
+                                                                 : game.ImageLocation)"
+                                 style="width:55px;height:55px;border-radius:6px;"
+                                 class="me-3" />
+
+                            <div>
+
+                                <strong>@game.Title</strong><br />
+
+                                <small>
+                                    Barcode:
+                                    @(game.Barcode ?? "Unknown")
+                                </small><br />
+
+                                <small>
+                                    Location:
+                                    @(game.LocationName ?? "Unknown")
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <form method="post"
+                              asp-page-handler="RemoveGame">
+
+                            <input type="hidden"
+                                   name="barcode"
+                                   value="@game.Barcode" />
+
+                            @for (int i = 0; i < Model.GamesToDelete.Count; i++)
+                            {
+                                <input type="hidden" asp-for="GamesToDelete[i].Title" />
+                                <input type="hidden" asp-for="GamesToDelete[i].Barcode" />
+                                <input type="hidden" asp-for="GamesToDelete[i].ImageLocation" />
+                                <input type="hidden" asp-for="GamesToDelete[i].LocationName" />
+                            }
+
+                            <button class="remove-btn">
+                                −
+                            </button>
+
+                        </form>
+
+                    </div>
+                }
+
+                @if (Model.GamesToDelete.Any())
+                {
+                    <div class="text-end mt-3">
+
+                        <form method="post"
+                              asp-page-handler="ShowConfirmation">
+
+                            @for (int i = 0; i < Model.GamesToDelete.Count; i++)
+                            {
+                                <input type="hidden" asp-for="GamesToDelete[i].Title" />
+                                <input type="hidden" asp-for="GamesToDelete[i].Barcode" />
+                                <input type="hidden" asp-for="GamesToDelete[i].ImageLocation" />
+                                <input type="hidden" asp-for="GamesToDelete[i].LocationName" />
+                            }
+
+                            <button class="btn btn-danger px-4">
+                                Delete Selected
+                            </button>
+
+                        </form>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ==================== CONFIRMATION MODAL ==================== -->
+@if (Model.ShowConfirmation)
+{
+    <div class="confirmation-overlay">
+
+        <div class="confirmation-modal">
+
+            <h3>
+                The following games will be deleted:
+            </h3>
+
+            <div class="confirmation-list">
+
+                @foreach (var game in Model.GamesToDelete)
+                {
+                    <div class="confirmation-game">
+                        @game.Title
+                    </div>
+                }
+
+            </div>
+
+            <p>
+                Would you like to continue?
+            </p>
+
+            <div class="confirmation-buttons">
+
+                <form method="post"
+                      asp-page-handler="CloseConfirmation">
+
+                    @for (int i = 0; i < Model.GamesToDelete.Count; i++)
+                    {
+                        <input type="hidden" asp-for="GamesToDelete[i].Title" />
+                        <input type="hidden" asp-for="GamesToDelete[i].Barcode" />
+                        <input type="hidden" asp-for="GamesToDelete[i].ImageLocation" />
+                        <input type="hidden" asp-for="GamesToDelete[i].LocationName" />
+                    }
+
+                    <button class="btn btn-dark">
+                        No, Go Back
+                    </button>
+
+                </form>
+
+                <form method="post"
+                      asp-page-handler="DeleteGames">
+
+                    @for (int i = 0; i < Model.GamesToDelete.Count; i++)
+                    {
+                        <input type="hidden" asp-for="GamesToDelete[i].Title" />
+                        <input type="hidden" asp-for="GamesToDelete[i].Barcode" />
+                        <input type="hidden" asp-for="GamesToDelete[i].ImageLocation" />
+                        <input type="hidden" asp-for="GamesToDelete[i].LocationName" />
+                    }
+
+                    <button class="btn btn-danger">
+                        Yes, Delete
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+<!-- ================= SCRIPTS ================= -->
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://unpkg.com/@@zxing/library@latest/umd/index.min.js"></script>
+
+    <script src="~/js/barcodeScanner.js"></script>
+
+}

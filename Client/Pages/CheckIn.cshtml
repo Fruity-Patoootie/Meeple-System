@@ -1,0 +1,324 @@
+﻿@page
+@model CheckInModel
+
+@{
+    var currentPage =
+        ViewContext.RouteData.Values["page"]?.ToString();
+}
+
+<!-- ================= HEADER ================= -->
+
+<div class="report-header d-flex align-items-center justify-content-between mb-3">
+
+    <div class="tab-bar">
+
+        <a asp-page="/CheckIn"
+               class="tab @(currentPage == "/CheckIn" ? "active" : "")">
+            Check In
+        </a>
+
+        <a asp-page="/AddGame"
+               class="tab @(currentPage == "/AddGame" ? "active" : "")">
+            Add Game
+        </a>
+
+        <a asp-page="/AddGameFromCSV"
+               class="tab @(currentPage == "/AddGameFromCSV" ? "active" : "")">
+            Add Game From CSV
+        </a>
+
+        <a asp-page="/Delete"
+               class="tab delete-tab @(currentPage == "/Delete" ? "active" : "")">
+            Delete Game
+        </a>
+
+    </div>
+
+</div>
+
+<!-- ================= SUCCESS MESSAGE ================= -->
+@if (!string.IsNullOrWhiteSpace(Model.SuccessMessage))
+{
+    <div class="container">
+        <div class="alert alert-info mb-3">
+            @Model.SuccessMessage
+        </div>
+    </div>
+}
+
+<!-- ================= CONTENT ================= -->
+
+<div class="container">
+
+    <div class="filter-panel p-4">
+
+        <div class="row g-4">
+
+            <!-- ================================================= -->
+            <!-- LEFT SIDE -->
+            <!-- ================================================= -->
+
+            <div class="col-12 col-md-5">
+                <!-- MANUAL INPUT -->
+
+                @if (Model.isValidBarcode)
+                {
+                    <form method="post" asp-page-handler="LookupBarcode">
+
+                        <label class="mb-2">
+                            Scan or Enter Barcode
+                        </label>
+
+                        <input asp-for="CheckInBarcode"
+                        class="form-control mb-2"
+                        placeholder="Scan or enter barcode..."
+                        autocomplete="off" />
+
+
+
+                        <!-- Preserve Queue -->
+                        @for (int i = 0; i < Model.CheckedInGames.Count; i++)
+                        {
+                            <input type="hidden"
+                            asp-for="CheckedInGames[i].Title" />
+
+                            <input type="hidden"
+                            asp-for="CheckedInGames[i].Barcode" />
+
+                            <input type="hidden"
+                            asp-for="CheckedInGames[i].ImageLocation" />
+
+                            <input type="hidden"
+                            asp-for="CheckedInGames[i].LocationName" />
+                        }
+
+                        <button type="submit"
+                        class="btn btn-dark w-100 mb-3">
+
+                            Check Barcode
+
+                        </button>
+
+                    </form>
+                }
+                else
+                {
+                    <form method="post" asp-page-handler="AddBarcode">
+
+
+                        <label class="mb-2">
+                            Please enter a title associated with the barcode
+                        </label>
+
+                        <input asp-for="CheckInBarcode"
+                        class="form-control mb-2"
+                        placeholder="Scan or enter barcode..."
+                        autocomplete="off" />
+
+                        <input asp-for="TitleForBarcodeToCheck"
+                        class="form-control mb-2"
+                        placeholder="Enter the game's title..."
+                        autocomplete="off" />
+
+
+
+                        <!-- Preserve Queue -->
+                        @for (int i = 0; i < Model.CheckedInGames.Count; i++)
+                        {
+                            <input type="hidden"
+                            asp-for="CheckedInGames[i].Title" />
+
+                            <input type="hidden"
+                            asp-for="CheckedInGames[i].Barcode" />
+
+                            <input type="hidden"
+                            asp-for="CheckedInGames[i].ImageLocation" />
+
+                            <input type="hidden"
+                            asp-for="CheckedInGames[i].LocationName" />
+                        }
+
+                        <button type="submit"
+                        class="btn btn-dark w-100 mb-3">
+
+                            Check Barcode
+
+                        </button>
+
+                    </form>
+                }
+
+
+                <hr />
+
+                <!-- SCANNER -->
+
+                <div class="video-wrapper text-center mt-3">
+
+                    <video id="video"
+                           class="scanner-video"
+                           autoplay
+                           muted
+                           playsinline>
+                    </video>
+
+                    <div class="mt-2">
+
+                        <button type="button"
+                                id="startScan"
+                                class="btn export-btn btn-sm">
+
+                            Scan Barcode
+
+                        </button>
+
+                    </div>
+
+                    <small class="text-dark d-block mt-2">
+
+                        Scanned:
+                        <span id="result">None</span>
+
+                    </small>
+
+                </div>
+
+            </div>
+
+            <!-- ================================================= -->
+            <!-- RIGHT SIDE -->
+            <!-- ================================================= -->
+
+            <div class="col-12 col-md-7">
+
+                <h5 class="mb-3">
+                    Checked In
+                </h5>
+
+                <div class="results-box">
+
+                    @if (Model.CheckedInGames.Any())
+                    {
+                        @foreach (var game in Model.CheckedInGames)
+                        {
+                            <div class="result-item d-flex align-items-center justify-content-between mb-2 p-3">
+
+                                <!-- IMAGE -->
+
+                                <div class="d-flex align-items-center">
+
+                                    <img src="@(
+                                                                             string.IsNullOrWhiteSpace(game.ImageLocation)
+                                                                                 ? "/images/logo.png"
+                                                                                 : game.ImageLocation)"
+                                         class="me-3 rounded"
+                                         style="width:60px; height:60px;" />
+
+                                    <!-- INFO -->
+
+                                    <div>
+
+                                        <strong>
+                                            @game.Title
+                                        </strong><br />
+
+                                        UPC:
+                                        @game.Barcode<br />
+
+                                        Location:
+                                        @(game.LocationName ?? "N/A")
+
+                                    </div>
+
+                                </div>
+
+                                <!-- REMOVE BUTTON -->
+
+                                <form method="post"
+                                      asp-page-handler="RemoveGame">
+
+                                    <input type="hidden"
+                                           name="barcode"
+                                           value="@game.Barcode" />
+
+                                    <!-- Preserve Queue -->
+                                    @for (int i = 0; i < Model.CheckedInGames.Count; i++)
+                                    {
+                                        <input type="hidden"
+                                               asp-for="CheckedInGames[i].Title" />
+
+                                        <input type="hidden"
+                                               asp-for="CheckedInGames[i].Barcode" />
+
+                                        <input type="hidden"
+                                               asp-for="CheckedInGames[i].ImageLocation" />
+
+                                        <input type="hidden"
+                                               asp-for="CheckedInGames[i].LocationName" />
+                                    }
+
+                                    <button class="remove-btn">
+                                        −
+                                    </button>
+
+                                </form>
+
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-muted">
+                            No games scanned yet.
+                        </div>
+                    }
+
+                </div>
+
+                <!-- ================= FINAL CHECK IN ================= -->
+                @if (Model.CheckedInGames.Any())
+                {
+                    <div class="text-end mt-3">
+
+                        <form method="post"
+                              asp-page-handler="CheckInGames">
+
+                            <!-- Preserve Queue -->
+                            @for (int i = 0; i < Model.CheckedInGames.Count; i++)
+                            {
+                                <input type="hidden"
+                                       asp-for="CheckedInGames[i].Title" />
+
+                                <input type="hidden"
+                                       asp-for="CheckedInGames[i].Barcode" />
+                            }
+
+                            <button class="btn export-btn px-4 py-2">
+
+                                Check In
+
+                            </button>
+
+                        </form>
+
+                    </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script src="https://unpkg.com/@@zxing/library@latest/umd/index.min.js"></script>
+
+    <script src="~/js/barcodeScanner.js"></script>
+
+}

@@ -1,0 +1,120 @@
+﻿@page
+@model DetailsModel
+
+<div class="details-wrapper">
+
+    <div class="details-container">
+
+        @if (Model.Game == null)
+        {
+            <div class="text-danger">
+                @(Model.ErrorMessage ?? "Game not found.")
+            </div>
+        }
+        else
+        {
+            <div class="details-card d-flex">
+
+                <!-- IMAGE -->
+                <div class="details-image">
+                    <img src="@(Model.Game.ImageLocation ?? "/images/logo.png")" />
+                </div>
+
+                <!-- INFO -->
+                <div class="details-info">
+
+                    <div class="info-row">
+                        Name: @Model.Game.Title
+                    </div>
+
+                    <div class="info-row">
+                        Weight: @Model.Game.Weight
+                    </div>
+
+                    <div class="info-row">
+                        Style: @(Model.Game.Style ?? "N/A")
+                    </div>
+
+                    <div class="info-row">
+                        Times Played: @Model.Game.NumberOfTimesPlayed
+                    </div>
+
+                    <div class="info-row">
+                        Location: @(Model.Game.LocationName ?? "N/A")
+                    </div>
+
+                    <div class="info-row">
+                        Supplier: @(Model.Game.SupplierName ?? "N/A")
+                    </div>
+
+                    <div class="info-row">
+                        Seller: @(Model.Game.SellerName ?? "N/A")
+                    </div>
+
+                    <div class="info-row">
+                        Cost: $@Model.Game.Cost
+                    </div>
+
+                    <div class="info-row">
+                        Players: @Model.Game.MinPlayers - @Model.Game.MaxPlayers
+                    </div>
+
+                    <div class="info-row">
+                        Recommended: @(Model.Game.RecommendedPlayers ?? "N/A")
+                    </div>
+
+                    <div class="info-row">
+                        Best: @(Model.Game.BestPlayers ?? "N/A")
+                    </div>
+
+                    <div class="info-row">
+                        Duration: @Model.Game.MinDuration - @Model.Game.MaxDuration mins
+                    </div>
+
+                    <div class="info-row">
+                        Expansion: @(Model.Game.Expansion == true ? "Yes" : "No")
+                    </div>
+
+                    <div class="info-row">
+                        Acquired: @(Model.Game.DateAcquired?.ToString("yyyy-MM-dd") ?? "N/A")
+                    </div>
+                    <div class="info-row">
+                        BGG ID: @Model.Game.BggGameId
+                    </div>
+                    <div class="info-row">
+                        Needs BGG Entry:
+                        @(Model.Game.NeedsAddedToBgg == true ? "Yes" : "No")
+                    </div>
+
+                    <!-- CHECK IN BUTTON -->
+                    <a asp-page="/Edit"
+                           asp-route-title="@Model.Game.Title"
+                           class="btn export-btn mt-3">
+                        Edit Game
+                    </a>
+
+                    <!-- BACK BUTTON -->
+                    <button type="button"
+                            class="btn btn-light mt-3 ms-2"
+                            onclick="goBackOrReport()">
+                        Back
+                    </button>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>
+
+<script>
+    function goBackOrReport() {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = '/Report';
+        }
+    }
+</script>
